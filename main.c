@@ -13,12 +13,12 @@ Project outline for my chatbot, made and conceptualised by Dan De Burgo
   5.) If the user wishes to end their chat they should type '{END CHAT}'
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <String.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
 
 int inputsize = 256, bufferchar = 0, count = 0;
-char inp[inputsize]; //Had to restrict memory usage somehow, could have done this on the heap using malloc but would have caused excess bother
+char inp[256]; //Had to restrict memory usage somehow, could have done this on the heap using malloc but would have caused excess bother
 
 void getinp(){ //gets user input
   printf(">>>"); // Print CLI thing
@@ -36,7 +36,7 @@ int main(int argc, char const *argv[]) {
   do {
     getinp();
   } while(strstr(inp, "{~}") != NULL);
-  while (!(strcmp(call, '{END CHAT}'))){ //While they want to carry on talking
+  while (!(strcmp(inp, '{END CHAT}'))){ //While they want to carry on talking
     //TODO Search file for the call, if not there call method to ask user how to respond
     //TODO Check for possible responses
     //TODO Generate OTF context rating for each response
