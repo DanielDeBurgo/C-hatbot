@@ -19,10 +19,15 @@ Project outline for my chatbot, made and conceptualised by Dan De Burgo
 
 int inputsize = 256, bufferchar = 0, count = 0;
 char inp[256]; //Had to restrict memory usage somehow, could have done this on the heap using malloc but would have caused excess bother
+char line[512];
+int resps[512];
+int respsize = 0;
+char * pointchar;
+int boolfound = 0;
 
 void getinp(){ //gets user input
   printf(">>>"); // Print CLI thing
-  while((bufferchar = getchar()) != '\n' && bufferchar != EOF){ //Clear input buffer to get input
+  while((bufferchar = getchar()) && bufferchar != '\n' && bufferchar != EOF){ //Clear input buffer to get input
     if(count < inputsize) //If we haven't got enough characers yet
       inp[count++] = bufferchar; //Add the input to the inp
     }
@@ -32,21 +37,56 @@ void getinp(){ //gets user input
 
 
 int main(int argc, char const *argv[]) {
-  //TODO Load 'database' file
+  //Load 'database' file
+  database = fopen("database.txt","r");
+
+
   do {
     getinp();
-  } while(strstr(inp, "{~}") != NULL);
-  while (!(strcmp(inp, '{END CHAT}'))){ //While they want to carry on talking
+  } while(!(strstr(inp, "{-}") != NULL));
+  boolfound = 0;
+
+
+  while (strcmp(inp, "{END CHAT}")){ //While they want to carry on talking
     //TODO Search file for the call, if not there call method to ask user how to respond
-    //TODO Check for possible responses
-    //TODO Generate OTF context rating for each response
-    //TODO Average each context rating with each file rating
-    //TODO Output biggest Average
-    printf("I would do some cool caluclations here and respond but as yet I am unable \n");
+
+    //TEMP Bruteforce search while I work out how to seek
+    while ((c = getc(database)) != EOF){
+      if (c == '\n'){
+        //We have a line do stuff to it
+        pointchar = strtok(line,"/");
+        while (pointchar != NULL)
+        {
+          //printf("%s\n", pointchar);
+          //TODO Check for possible responses
+          if (strcmp(pointchar, inp)){
+              boolfound = 1;
+              pointchar = strtok(NULL, "/");
+              resps[respsize] = atoi(pointchar);
+              respsize++;
+          }
+          pointchar = strtok(NULL, "/");
+        }
+        line = "";
+      }
+      else{
+        line = line + c;
+      }
+    }
+    if (boolfound){
+      //TODO Generate OTF context rating for each response
+      //TODO Average each context rating with each file rating
+      //TODO Output biggest Average  
+    }
+    else{
+      printf("How would you respond to that? \n")
+    }
     do {
       getinp();
-    } while(strstr(inp, "{~}") != NULL);
+    } while(strstr(inp, "{-}") != NULL);
+    boolfound = 0;
   }
+  fclose(database);
 }
 
 //TODO Once this file is finished split into multiple files and make a Makefile
