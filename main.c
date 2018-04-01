@@ -11,6 +11,14 @@ Project outline for my chatbot, made and conceptualised by Dan De Burgo
       bot has asked how they would respond.
   4.) Multiple calls will be concatenated to form one call. The user will type '{~}' to tell the bot when to respond
   5.) If the user wishes to end their chat they should type '{END CHAT}'
+
+  database layout:
+
+  ------BEGIN FILE------
+  call / response / rating
+  call / response / rating
+  call / response / rating
+  ------ END FILE ------
 */
 
 #include<stdio.h>
@@ -38,7 +46,7 @@ void getinp(){ //gets user input
 
 int main(int argc, char const *argv[]) {
   //Load 'database' file
-  database = fopen("database.txt","r");
+  database = fopen("database.txt","r+");
 
 
   do {
@@ -48,38 +56,49 @@ int main(int argc, char const *argv[]) {
 
 
   while (strcmp(inp, "{END CHAT}")){ //While they want to carry on talking
-    //TODO Search file for the call, if not there call method to ask user how to respond
-
-    //TEMP Bruteforce search while I work out how to seek
-    while ((c = getc(database)) != EOF){
-      if (c == '\n'){
-        //We have a line do stuff to it
-        pointchar = strtok(line,"/");
-        while (pointchar != NULL)
-        {
-          //printf("%s\n", pointchar);
-          //TODO Check for possible responses
-          if (strcmp(pointchar, inp)){
-              boolfound = 1;
-              pointchar = strtok(NULL, "/");
-              resps[respsize] = atoi(pointchar);
-              respsize++;
+    //TODO check the user hasn't typed "{REP}" to replace the response in the database
+    if (strcmp(inp, "{REP}")){
+      //TEMP Bruteforce search while I work out how to seek
+      while ((c = getc(database)) != EOF){
+        if (c == '\n'){
+          //We have a line do stuff to it
+          pointchar = strtok(line,"/");
+          while (pointchar != NULL)
+          {
+            //printf("%s\n", pointchar);
+            //TODO Check for possible responses
+            if (strcmp(pointchar, inp)){
+                boolfound = 1;
+                pointchar = strtok(NULL, "/");
+                resps[respsize] = atoi(pointchar);
+                respsize++;
+            }
+            pointchar = strtok(NULL, "/"); //TEMP unsure about this NULL
           }
-          pointchar = strtok(NULL, "/");
+          line = "";
         }
-        line = "";
-      }
-      else{
-        line = line + c;
+        else{
+          line = line + c;
+        }
       }
     }
+    else{
+      //NEED TO FETCH PREVIOUS INP SOMEHOW
+    }
+
     if (boolfound){
       //TODO Generate OTF context rating for each response
       //TODO Average each context rating with each file rating
-      //TODO Output biggest Average  
+      //TODO Output biggest Average
     }
     else{
       printf("How would you respond to that? \n")
+      fprintf(database, "%s / ", inp);
+      do {
+        getinp();
+      } while(strstr(inp, "{-}") != NULL);
+      fprintf(database, "%s / 1\n", inp);
+      //Add to the file with the response and file rating
     }
     do {
       getinp();
