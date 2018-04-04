@@ -13,12 +13,10 @@ Project outline for my chatbot, made and conceptualised by Dan De Burgo
   5.) If the user wishes to end their chat they should type '{END CHAT}'
 
   database layout:
-
-  ------BEGIN FILE------
-  call / response / rating
-  call / response / rating
-  call / response / rating
-  ------ END FILE ------
+  3 files
+  File1 (calls.txt) contains all calls
+  File2 (resps.txt) contains all responses
+  File3 (avers.txt) contains all numbers
 */
 
 #include<stdio.h>
