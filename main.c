@@ -14,9 +14,33 @@ Project outline for my chatbot, made and conceptualised by Dan De Burgo
 
   database layout:
   3 files
-  File1 (calls.txt) contains all calls
-  File2 (resps.txt) contains all responses
-  File3 (avers.txt) contains all numbers
+  File1 (calls.txt)
+  --------START--------
+
+    call
+    call
+    call
+    ...
+
+  -------- END --------
+  File2 (resps.txt)
+  --------START--------
+
+  response,callLineNo
+  response,callLineNo
+  response,callLineNo
+  ...
+
+  -------- END --------
+  File3 (avers.txt) contains all numbers for responses
+  --------START--------
+
+  number,responseLineNo
+  number,responseLineNo
+  number,responseLineNo
+  ...
+
+  -------- END --------
 */
 
 #include<stdio.h>

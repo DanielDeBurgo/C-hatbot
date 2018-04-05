@@ -33,7 +33,24 @@ void replaceinp(FILE *db1, FILE *db2, FILE *db3, char *toRep){
   int lineNo = searched.a;
 
   //TODO FINISH THIS
+
+
 }
+
+void notsurehowtorespond(FILE *db1, FILE *db2, FILE *db3, char *notSureAbout){
+  printf("How would you respond to that? \n")
+  do {
+    getinp();
+  } while(strstr(inp, "{-}") != NULL);
+  matchAndNo searched = searchdb(db1, inp);
+  int lineNo = searched.a;
+  fprintf(db1, "%s\n", notSureAbout);
+  fprintf(db2, "%s,%i\n", inp, lineNo);
+  matchAndNo searched = searchdb(db2, inp);
+  lineNo = searched.a;
+  fprintf(db3, "1,%i\n", lineNo);
+}
+
 char *respond(char *call){
   //TODO
 }
