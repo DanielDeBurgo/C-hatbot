@@ -15,12 +15,27 @@ void getinp(){ //gets user input
     count = 0; //Reset the count for next time
 }
 
+char *getline(FILE *from, int lineNo){
+  int count = 0;
+  if (from != NULL ){
+    char line[256];
+    while (fgets(line, sizeof(line), from) != NULL){
+    if (count == lineNumber){
+      return line;
+    }
+    else{
+      count++;
+    }
+    }
+  }
+}
+
 //Splits a string by the first instance of splitting and returns the rest of the string
 char *splitby(char *splitting, char tosplit){
   char *toreturn = "";
   for (int i = 0; i < strlen(splitting); i++){
     if (!(strcmp(splitting[i], tosplit))){
-      for (int j = i; j < strlen(splitting); j++){
+      for (int j = i + 1; j < strlen(splitting); j++){
           toreturn = strcat(toreturn, splitting[j]);
       }
     }
@@ -123,10 +138,10 @@ void replaceinp(FILE *db1, FILE *db2, FILE *db3, char *toRepCall, char *toRepRes
   //Do the maths
   matchAndNo toRepSearched = searchdb(db2, toRepResponse, 0);
   matchAndNo toRepSearched2 = searchdb2(db3, toRepSearched.a, 0);
-  int diff;
+  double diff;
   for (int i = 0; i < (sizeof(searched3) / sizeof(searched3[0]); i++){
     if (toRepSearched2.a == searched3[i].a && toRepSearched2.b == searched3[i].b){
-      char *toAppend = splitby(sarched3[i].b ,"~");
+      char *toAppend = splitby(searched3[i].b ,"~");
       char temp = '0';
       char beginning[512];
       int count = 0;
@@ -176,4 +191,62 @@ void notsurehowtorespond(FILE *db1, FILE *db2, FILE *db3, char *notSureAbout){
 
 char *respond(char *call){
   //TODO
+
+  matchAndNo searched = searchdb(db1, toRepCall, 0);
+  int omit = 0;
+  matchAndNo searched2[512];
+  matchAndNo searched2res = searchdb2(db2, lineNo, omit);
+  while (searched2res != NULL) {
+    searched2[omit] = searched2res;
+    omit++;
+    searched2res = searchdb2(db2, lineNo, omit);
+  }
+  matchAndNo searched3[512];
+  for (int i = 0; i < (sizeof(searched2) / sizeof(searched2[0]); i++)){
+    int lineNo2 = searched2[i].a;
+    matchAndNo searched3res = searchdb2(db3, lineNo2, omit);
+    while (searched3res != NULL) {
+      searched3[omit] = searched3res;
+      omit++;
+      searched3res = searchdb2(db3, lineNo, omit);
+    }
+  }
+  double avers[512];
+  for (int i = 0; i < (sizeof(searched3) / sizeof(searched3[0]); i++)){
+    char temp = '0';
+    char beginning[512];
+    int count = 0;
+    while (temp != '~'){
+      beginning[count] = searched3[i].b[count];
+      count++;
+    }
+    avers[i] = atoi(beginning);
+  }
+
+  double cumulativeProbability = 0;
+  time_t t;
+  srand((unsigned) time(&t));
+  double randomChosen = (double)rand() / (double)RAND_MAX ;
+  for (int i = 0; i < sizeof(avers); i++)){
+    cumulativeProbability = cumulativeProbability + avers[i];
+    if (randomChosen <= cumulativeProbability){
+      for (int j = 0; j < (sizeof(searched3) / sizeof(searched3[0]); j++){
+        if (strstr(searched3[j].b, itoa(avers[i])) != NULL){
+          int linedb2 = atoi(splitby(searched3[j].b, "~"));
+        }
+      }
+      char *lineIndb2 = getline(db2, linedb2);
+      char toRespond[512];
+      for (int k = 0; k < strlen(lineIndb2); k++);{
+        if (lineIndb2[k] == '~'){
+          break;
+        }
+        else{
+          torespond[k] = lineIndb2[k];
+        }
+      }
+      printf("%s\n", toRespond);
+    }
+  }
+
 }
