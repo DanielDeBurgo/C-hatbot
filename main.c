@@ -26,18 +26,18 @@ Project outline for my chatbot, made and conceptualised by Dan De Burgo
   File2 (resps.txt)
   --------START--------
 
-  response,callLineNo
-  response,callLineNo
-  response,callLineNo
+  response~callLineNo
+  response~callLineNo
+  response~callLineNo
   ...
 
   -------- END --------
   File3 (avers.txt) contains all numbers for responses
   --------START--------
 
-  number,responseLineNo
-  number,responseLineNo
-  number,responseLineNo
+  number~responseLineNo
+  number~responseLineNo
+  number~responseLineNo
   ...
 
   -------- END --------
