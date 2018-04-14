@@ -1,10 +1,12 @@
-struct matchAndNo {
+typedef struct matchAndNo {
     int a;
     char *b;
-};
+} matchAndNo;
+char arrGetLine[256];
+char arrsplitby[512];
+// Functions are below. They have been tested as working if commented DONE
 
-// Functions are below
-
+//Gets input from user DONE
 void getinp(){ //gets user input
   printf(">>>"); // Print CLI thing
   while((bufferchar = getchar()) && bufferchar != '\n' && bufferchar != EOF){ //Clear input buffer to get input
@@ -15,36 +17,43 @@ void getinp(){ //gets user input
     count = 0; //Reset the count for next time
 }
 
+//Gets a specific line from a file DONE
 char *getline(FILE *from, int lineNo){
+  rewind(from);
   int count = 0;
   if (from != NULL ){
-    char line[256];
-    while (fgets(line, sizeof(line), from) != NULL){
-    if (count == lineNumber){
-      return line;
-    }
-    else{
-      count++;
-    }
-    }
-  }
-}
-
-//Splits a string by the first instance of splitting and returns the rest of the string
-char *splitby(char *splitting, char tosplit){
-  char *toreturn = "";
-  for (int i = 0; i < strlen(splitting); i++){
-    if (!(strcmp(splitting[i], tosplit))){
-      for (int j = i + 1; j < strlen(splitting); j++){
-          toreturn = strcat(toreturn, splitting[j]);
+    while (fgets(arrGetLine, sizeof(arrGetLine), from) != NULL){
+      //printf("IN SCOPE %s\n", arrGetLine);
+      if (count == lineNo){
+        return arrGetLine;
+      }
+      else{
+        count++;
       }
     }
   }
-  return toreturn;
 }
 
-//Searches a database without commas
+//Splits a string by the first instance of splitting and returns the rest of the string DONE
+char *splitby(char *splitting, char tosplit){
+  int count = 0;
+  for (int k = 0; k < 512; k++) {
+    arrsplitby[k] = NULL;
+  }
+  for (int i = 0; i < strlen(splitting) - 1; i++){
+    if (splitting[i] == tosplit){
+      for (int j = i + 1; j < strlen(splitting); j++){
+          arrsplitby[count] = splitting[j];
+          count++;
+      }
+    }
+  }
+  return arrsplitby;
+}
+
+//Searches a database without ~ DONE BUT REMEMBER TO CHANGE ANY NULL CHECKS TO .b NULL CHECKS
 matchAndNo searchdb(FILE *db, char *toFind, int omit){
+  rewind(db);
   char line[512];
   int lineNum = 1;
   while(fgets(line, 512, db) != NULL) {
@@ -57,10 +66,11 @@ matchAndNo searchdb(FILE *db, char *toFind, int omit){
 		}
 		lineNum++;
 	}
-  return NULL;
+  matchAndNo r = {-1, NULL};
+  return r;
 }
 
-//Searches a database with commas
+//Searches a database with ~
 matchAndNo searchdb2(FILE *db, char *toFind, int omit){
   char line[512];
   int lineNum = 1;
@@ -83,6 +93,7 @@ matchAndNo searchdb2(FILE *db, char *toFind, int omit){
   return NULL;
 }
 
+//What to do when the user doesn't like what the chatbot says
 void replaceinp(FILE *db1, FILE *db2, FILE *db3, char *toRepCall, char *toRepResponse, char *repWith){
   //Finds toRep as a call, stores in searched
   matchAndNo searched = searchdb(db1, toRepCall, 0);
@@ -189,64 +200,67 @@ void notsurehowtorespond(FILE *db1, FILE *db2, FILE *db3, char *notSureAbout){
   fprintf(db3, "1~%i\n", lineNo);
 }
 
+//How to find out what to respond with
 char *respond(char *call){
-  //TODO
-
   matchAndNo searched = searchdb(db1, toRepCall, 0);
-  int omit = 0;
-  matchAndNo searched2[512];
-  matchAndNo searched2res = searchdb2(db2, lineNo, omit);
-  while (searched2res != NULL) {
-    searched2[omit] = searched2res;
-    omit++;
-    searched2res = searchdb2(db2, lineNo, omit);
-  }
-  matchAndNo searched3[512];
-  for (int i = 0; i < (sizeof(searched2) / sizeof(searched2[0]); i++)){
-    int lineNo2 = searched2[i].a;
-    matchAndNo searched3res = searchdb2(db3, lineNo2, omit);
-    while (searched3res != NULL) {
-      searched3[omit] = searched3res;
+  if (searched != NULL){
+    int omit = 0;
+    matchAndNo searched2[512];
+    matchAndNo searched2res = searchdb2(db2, lineNo, omit);
+    while (searched2res != NULL) {
+      searched2[omit] = searched2res;
       omit++;
-      searched3res = searchdb2(db3, lineNo, omit);
+      searched2res = searchdb2(db2, lineNo, omit);
     }
-  }
-  double avers[512];
-  for (int i = 0; i < (sizeof(searched3) / sizeof(searched3[0]); i++)){
-    char temp = '0';
-    char beginning[512];
-    int count = 0;
-    while (temp != '~'){
-      beginning[count] = searched3[i].b[count];
-      count++;
-    }
-    avers[i] = atoi(beginning);
-  }
-
-  double cumulativeProbability = 0;
-  time_t t;
-  srand((unsigned) time(&t));
-  double randomChosen = (double)rand() / (double)RAND_MAX ;
-  for (int i = 0; i < sizeof(avers); i++)){
-    cumulativeProbability = cumulativeProbability + avers[i];
-    if (randomChosen <= cumulativeProbability){
-      for (int j = 0; j < (sizeof(searched3) / sizeof(searched3[0]); j++){
-        if (strstr(searched3[j].b, itoa(avers[i])) != NULL){
-          int linedb2 = atoi(splitby(searched3[j].b, "~"));
-        }
+    matchAndNo searched3[512];
+    for (int i = 0; i < (sizeof(searched2) / sizeof(searched2[0]); i++)){
+      int lineNo2 = searched2[i].a;
+      matchAndNo searched3res = searchdb2(db3, lineNo2, omit);
+      while (searched3res != NULL) {
+        searched3[omit] = searched3res;
+        omit++;
+        searched3res = searchdb2(db3, lineNo, omit);
       }
-      char *lineIndb2 = getline(db2, linedb2);
-      char toRespond[512];
-      for (int k = 0; k < strlen(lineIndb2); k++);{
-        if (lineIndb2[k] == '~'){
-          break;
-        }
-        else{
-          torespond[k] = lineIndb2[k];
-        }
+    }
+    double avers[512];
+    for (int i = 0; i < (sizeof(searched3) / sizeof(searched3[0]); i++)){
+      char temp = '0';
+      char beginning[512];
+      int count = 0;
+      while (temp != '~'){
+        beginning[count] = searched3[i].b[count];
+        count++;
       }
-      printf("%s\n", toRespond);
+      avers[i] = atoi(beginning);
+    }
+
+    double cumulativeProbability = 0;
+    time_t t;
+    srand((unsigned) time(&t));
+    double randomChosen = (double)rand() / (double)RAND_MAX ;
+    for (int i = 0; i < sizeof(avers); i++)){
+      cumulativeProbability = cumulativeProbability + avers[i];
+      if (randomChosen <= cumulativeProbability){
+        for (int j = 0; j < (sizeof(searched3) / sizeof(searched3[0]); j++){
+          if (strstr(searched3[j].b, itoa(avers[i])) != NULL){
+            int linedb2 = atoi(splitby(searched3[j].b, "~"));
+          }
+        }
+        char *lineIndb2 = getline(db2, linedb2);
+        char toRespond[512];
+        for (int k = 0; k < strlen(lineIndb2); k++);{
+          if (lineIndb2[k] == '~'){
+            break;
+          }
+          else{
+            torespond[k] = lineIndb2[k];
+          }
+        }
+        printf("%s\n", toRespond);
+      }
     }
   }
-
+  else{
+    return NULL;
+  }
 }
