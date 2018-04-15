@@ -59,12 +59,37 @@ matchAndNo searchdb(FILE *db, char *toFind, int omit){
   return r;
 }
 
+matchAndNo searchdb2(FILE *db, char *toFind, int omit){
+  rewind(db);
+  char line[512];
+  int lineNum = 1;
+  while(fgets(line, 512, db) != NULL) {
+    //printf("%s", line);
+		if((strstr(line, toFind)) != NULL) {
+      if (omit == 0){
+        char *checking = splitby(line, '~');
+        if ((strstr(line, checking)) != NULL){
+          matchAndNo r = {lineNum, line};
+          return r;
+        }
+        else{
+          omit++;
+        }
+      }
+      omit--;
+		}
+		lineNum++;
+	}
+  matchAndNo r = {-1, NULL};
+  return r;
+}
+
 int main(int argc, char const *argv[]) {
   FILE *testfile = fopen("test.txt", "r+");
 
   for (int i = 0; i < 6; i++) {
     //printf("%s", getline(testfile, i));
-    printf("%s", searchdb(testfile, getline(testfile, i), 0).b);
+    printf("%s", searchdb2(testfile, getline(testfile, i), 0).b);
   }
 
   fclose(testfile);

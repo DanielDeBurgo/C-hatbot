@@ -70,15 +70,17 @@ matchAndNo searchdb(FILE *db, char *toFind, int omit){
   return r;
 }
 
-//Searches a database with ~
+//Searches a database with ~ DONE
 matchAndNo searchdb2(FILE *db, char *toFind, int omit){
+  rewind(db);
   char line[512];
   int lineNum = 1;
   while(fgets(line, 512, db) != NULL) {
+    //printf("%s", line);
 		if((strstr(line, toFind)) != NULL) {
       if (omit == 0){
-        char *checking = splitby(line, "~");
-        if (!(strcmp(checking, line))){
+        char *checking = splitby(line, '~');
+        if ((strstr(line, checking)) != NULL){
           matchAndNo r = {lineNum, line};
           return r;
         }
@@ -90,7 +92,8 @@ matchAndNo searchdb2(FILE *db, char *toFind, int omit){
 		}
 		lineNum++;
 	}
-  return NULL;
+  matchAndNo r = {-1, NULL};
+  return r;
 }
 
 //What to do when the user doesn't like what the chatbot says
