@@ -181,11 +181,11 @@ void replaceinp(FILE *db1, FILE *db2, FILE *db3, char *toRepCall, char *toRepRes
         count++;
       }
       diff = atoi(beginning);
-      searched3[i].b = strcat(itoa((atoi(beginning) / 2)), strcat("~", toAppend))
+      searched3[i].b = strcat(itoa((atoi(beginning) / 2)), strcat("~", toAppend));
       diff = diff - atoi(searched3[i].b);
     }
   }
-  for (int i = 0; i < (sizeof(searched3) / sizeof(searched3[0]); i++){
+  for (int i = 0; i < (sizeof(searched3) / sizeof(searched3[0])); i++){
     if (toRepSearched2.a != searched3[i].a && toRepSearched2.b != searched3[i].b){
       char *toAppend = splitby(sarched3[i].b ,"~");
       char temp = '0';
