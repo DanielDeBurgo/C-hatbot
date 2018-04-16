@@ -188,20 +188,24 @@ void replaceinp(FILE *db1, FILE *db2, FILE *db3, char *toRepCall, char *toRepRes
   }
 }
 
-//What to do when the bot doesn't know what to say
+//What to do when the bot doesn't know what to say DONE
 void notsurehowtorespond(FILE *db1, FILE *db2, FILE *db3, char *notSureAbout){
-  printf("How would you respond to that? \n")
+  printf("How would you respond to that? \n");
   do {
     getinp();
   } while(strstr(inp, "{-}") != NULL);
-  matchAndNo searched = searchdb(db1, inp, 0);
-  int lineNo = searched.a;
+  fseek(db1, 0, SEEK_END);
   fprintf(db1, "%s\n", notSureAbout);
+  matchAndNo searched = searchdb(db1, notSureAbout, 0);
+  int lineNo = searched.a;
+  fseek(db2, 0, SEEK_END);
   fprintf(db2, "%s~%i\n", inp, lineNo);
-  matchAndNo searched = searchdb(db2, inp, 0);
-  lineNo = searched.a;
+  matchAndNo searched2 = searchdb(db2, inp, 0);
+  lineNo = searched2.a;
+  fseek(db3, 0, SEEK_END);
   fprintf(db3, "1~%i\n", lineNo);
 }
+
 
 //How to find out what to respond with
 char *respond(char *call){
