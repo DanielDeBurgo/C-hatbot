@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 char arrsplitby[512];
 char arrGetLine[512];
 int inputsize = 256, bufferchar = 0, count = 0;
@@ -123,56 +124,75 @@ void replaceinp(FILE *db1, FILE *db2, FILE *db3, char *toRepCall, char *toRepRes
 
   //Finds all responses which respond to the toRepCall, stores in searched2
   matchAndNo searched2[512];
-  matchAndNo searched2res = searchdb2(db2, lineNo, omit);
-  while (searched2res != NULL) {
+  char tempNum[512];
+  sprintf(tempNum, "%d", lineNo);
+  matchAndNo searched2res = searchdb2(db2, tempNum, omit);
+
+  while (searched2res.b != NULL) {
     searched2[omit] = searched2res;
     omit++;
-    searched2res = searchdb2(db2, lineNo, omit);
+    char tempNum[512];
+    sprintf(tempNum, "%d", lineNo);
+    searched2res = searchdb2(db2, tempNum, omit);
   }
 
   //Finds all probabilities which are assigned to the relevant responses, stored in searched3
   matchAndNo searched3[512];
-  for (int i = 0; i < (sizeof(searched2) / sizeof(searched2[0]); i++)){
+  for (int i = 0; i < (sizeof(searched2) / sizeof(searched2[0])); i++){
     int lineNo2 = searched2[i].a;
-    matchAndNo searched3res = searchdb2(db3, lineNo2, omit);
-    while (searched3res != NULL) {
+    char tempNum[512];
+    sprintf(tempNum, "%d", lineNo2);
+    matchAndNo searched3res = searchdb2(db3, tempNum, omit);
+    while (searched3res.b != NULL) {
       searched3[omit] = searched3res;
       omit++;
-      searched3res = searchdb2(db3, lineNo, omit);
+      char tempNum[512];
+      sprintf(tempNum, "%d", lineNo);
+      searched3res = searchdb2(db3, tempNum, omit);
     }
   }
 
   //Delete all of the probabilities
-  for (int i = 0; i < (sizeof(searched3) / sizeof(searched3[0]); i++)){
+
+  for (int i = 0; i < (sizeof(searched3) / sizeof(searched3[0])); i++){
     int lineNo3 = searched3[i].a;
-    FILE *db4 = fopen("avers2.txt");
+    FILE *db4 = fopen("avers2.txt", "w+");
     int iterLineNo = 0;
-    char currentLine[512];
+    char *currentLine;
     int length;
-    while (fgets(currentLine, sizeof(currentLine), db3)) {
+
+    while (fgets(currentLine, sizeof(currentLine), db3) != NULL) {
       length = strlen(currentLine);
-      if (len && (line[len - 1] != '\n')){
+      if (length && (currentLine[length - 1] != '\n')){
         //Ignore
       }
       else{
         iterLineNo++;
         if (lineNo3 != iterLineNo){
-          fputs(line, db4);
+          fputs(currentLine, db4);
         }
       }
     }
+    fclose(db4);
     remove("avers.txt");
     rename("avers2.txt", "avers.txt");
-    fclose(db4);
   }
+  printf("Finished clearing averages \n");
 
   //Do the maths
-  matchAndNo toRepSearched = searchdb(db2, toRepResponse, 0);
-  matchAndNo toRepSearched2 = searchdb2(db3, toRepSearched.a, 0);
+  matchAndNo toRepSearched = searchdb2(db2, toRepResponse, 0);
+  printf("%d\n", toRepSearched.a);
+  char tempNum2[512];
+  sprintf(tempNum2, "%d", toRepSearched.a);
+  matchAndNo toRepSearched2 = searchdb2(db3, tempNum2, 0);
   double diff;
+  printf("Finished Initialisations\n");
+
+  //ERROR
   for (int i = 0; i < (sizeof(searched3) / sizeof(searched3[0])); i++){
-    if (toRepSearched2.a == searched3[i].a && toRepSearched2.b == searched3[i].b){
-      char *toAppend = splitby(searched3[i].b ,"~");
+    if (toRepSearched2.a == searched3[i].a && (!(strcmp(toRepSearched2.b,searched3[i].b)))){
+      printf("%s", searched3[i].b);
+      char *toAppend = splitby(searched3[i].b ,'~');
       char temp = '0';
       char beginning[512];
       int count = 0;
@@ -181,13 +201,22 @@ void replaceinp(FILE *db1, FILE *db2, FILE *db3, char *toRepCall, char *toRepRes
         count++;
       }
       diff = atoi(beginning);
-      searched3[i].b = strcat(itoa((atoi(beginning) / 2)), strcat("~", toAppend));
+      char tempNum[512];
+      sprintf(tempNum, "%d", (diff/2));
+      //searched3[i].b = strcat(itoa((atoi(beginning) / 2)), strcat("~", toAppend));
+      searched3[i].b = strcat(tempNum , strcat("~", toAppend)); //concatenate int of beginning / 2 with ~ and to append
       diff = diff - atoi(searched3[i].b);
     }
   }
+  printf("Finished for loop1\n");
+
   for (int i = 0; i < (sizeof(searched3) / sizeof(searched3[0])); i++){
-    if (toRepSearched2.a != searched3[i].a && toRepSearched2.b != searched3[i].b){
-      char *toAppend = splitby(sarched3[i].b ,"~");
+    if (toRepSearched2.a != searched3[i].a){
+      //Ignore
+      //printf("ign %d %d\n",toRepSearched2.a,searched3[i].a);
+    }else if (!(strcmp(toRepSearched2.b,searched3[i].b))){
+      //printf("%s", searched3[i].b);
+      char *toAppend = splitby(searched3[i].b ,'~');
       char temp = '0';
       char beginning[512];
       int count = 0;
@@ -195,13 +224,22 @@ void replaceinp(FILE *db1, FILE *db2, FILE *db3, char *toRepCall, char *toRepRes
         beginning[count] = searched3[i].b[count];
         count++;
       }
-      searched3[i].b = strcat(itoa((atoi(beginning) * diff)), strcat("~", toAppend))
+      char tempNum[512];
+      sprintf(tempNum, "%d", diff);
+      searched3[i].b = strcat(tempNum , strcat("~", toAppend));
+      //searched3[i].b = strcat(itoa((atoi(beginning) * diff)), strcat("~", toAppend));
+    }else{
+      printf("none of these\n");
     }
   }
 
+  //END OF ERROR
+
+
+  printf("Finished for loop 2\n");
   //Rewrite out searched3
-  for (int i = 0; i < (sizeof(searched3) / sizeof(searched3[0]); i++){
-    fprintf("%s\n", searched3[i].b);
+  for (int i = 0; i < (sizeof(searched3) / sizeof(searched3[0])); i++){
+    fprintf(db3, "%s\n", searched3[i].b);
   }
 }
 
@@ -214,9 +252,10 @@ int main(int argc, char const *argv[]) {
     //printf("%s", getline(testfile, i));
     //printf("%s", searchdb2(testfile, getline(testfile, i), 0).b);
   //}
-
   replaceinp(testfile1, testfile2, testfile3, "Hi", "Hello", "Greetings");
 
   fclose(testfile1);
+  fclose(testfile2);
+  fclose(testfile3);
   return 0;
 }

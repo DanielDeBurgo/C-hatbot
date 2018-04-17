@@ -68,7 +68,7 @@ void getinp(){ //gets user input
 
 int main(int argc, char const *argv[]) {
   //Load 'database' file
-  database = fopen("database.txt","r+");
+  database = fopen("database.txt","rw+");
 
 
   do {
