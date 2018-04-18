@@ -12,6 +12,17 @@ typedef struct matchAndNo {
     char *b;
 } matchAndNo;
 
+int getlinesoffile(FILE *where){
+  char line[512];
+  int counter = 0;
+
+  while(fgets(line, sizeof(line), where) != NULL){
+    counter++;
+  }
+
+  return counter;
+}
+
 void getinp(){ //gets user input
   printf(">>>"); // Print CLI thing
   while((bufferchar = getchar()) && bufferchar != '\n' && bufferchar != EOF){ //Clear input buffer to get input
@@ -123,15 +134,18 @@ void replaceinp(FILE *db1, FILE *db2, FILE *db3, char *toRepCall, char *toRepRes
   int omit = 0;
 
   //Finds all responses which respond to the toRepCall, stores in searched2
+
+  //OKAY VERY WEIRD ONE, IT'S ONLY ADDING TO MY ARRAY WHEN I PRINT OUT THE VALUES
+
   matchAndNo searched2[512];
   char tempNum[512];
   sprintf(tempNum, "%d", lineNo);
   matchAndNo searched2res = searchdb2(db2, tempNum, omit);
-  printf("%s",searched2res.b);
+  //printf("%s",searched2res.b);
   while (searched2res.b != NULL) {
-    printf("%s", searched2res.b);
+    //printf("%s", searched2res.b);
     searched2[omit] = searched2res;
-    printf("%i\n", omit);
+    //printf("%i\n", omit);
     omit++;
     char tempNum[512];
     sprintf(tempNum, "%d", lineNo);
@@ -139,23 +153,29 @@ void replaceinp(FILE *db1, FILE *db2, FILE *db3, char *toRepCall, char *toRepRes
   }
   printf("%s", searched2[0].b);
 
-  //Finds all probabilities which are assigned to the relevant responses, stored in searched3
+  //Finds all probabilities which are assigned to the relevant responses, stored in searched3 NEEDS WORK
   matchAndNo searched3[512];
+  omit = 0;
   for (int i = 0; i < (sizeof(searched2) / sizeof(searched2[0])); i++){
     int lineNo2 = searched2[i].a;
-    //printf("%d\n", lineNo2);
-    char tempNum[512];
-    sprintf(tempNum, "%d", lineNo2);
-    matchAndNo searched3res = searchdb2(db3, tempNum, omit);
-    while (searched3res.b != NULL) {
-      //printf("Hit the while loop \n");
-      searched3[omit] = searched3res;
-      omit++;
+    if (lineNo2 > 0 && lineNo2 <= getlinesoffile(db3)){
+      //printf("%d\n", lineNo2);
       char tempNum[512];
-      sprintf(tempNum, "%d", lineNo);
-      searched3res = searchdb2(db3, tempNum, omit);
+      sprintf(tempNum, "%d", lineNo2);
+      printf("%s %i\n", tempNum, omit);
+      matchAndNo searched3res = searchdb2(db3, tempNum, omit);
+      printf("%s", searched3res.b);
+      while (searched3res.b != NULL) {
+        //printf("Hit the while loop \n");
+        searched3[omit] = searched3res;
+        omit++;
+        char tempNum[512];
+        sprintf(tempNum, "%d", lineNo);
+        searched3res = searchdb2(db3, tempNum, omit);
+      }
     }
   }
+  printf("%s", searched3[0].b);
   //Delete all of the probabilities
   /*
   for (int i = 0; i < (sizeof(searched3) / sizeof(searched3[0])); i++){
