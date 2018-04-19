@@ -5,7 +5,7 @@
 char arrsplitby[512];
 char arrsplitby2[512];
 char arrGetLine[512];
-int inputsize = 256, bufferchar = 0, count = 0;
+int inputsize = 256, bufferchar = 0, count = 0, sizeOfSearched2 = 0;
 char inp[256]; //Had to restrict memory usage somehow, could have done this on the heap using malloc but would have caused excess bother
 
 typedef struct matchAndNo {
@@ -54,18 +54,19 @@ char *getline(FILE *from, int lineNo){
 
 void splitby(char *splitting, char tosplit){
   int count = 0;
-  for (int i = 0; i < strlen(splitting); i++){
-    if (splitting[i] == tosplit){
-      for (int j = i + 1; j < strlen(splitting); j++){
-        if (splitting[j] != '\0' && splitting[j] != '\n'){
-          arrsplitby[count] = splitting[j];
-          count++;
+  if(strlen(splitting) > 0)
+    for (int i = 0; i < strlen(splitting); i++){
+      if (splitting[i] == tosplit){
+        for (int j = i + 1; j < strlen(splitting); j++){
+          if (splitting[j] != '\0' && splitting[j] != '\n'){
+            arrsplitby[count] = splitting[j];
+            count++;
+          }
         }
+        arrsplitby[count] = '\0';
+        break;
       }
-      arrsplitby[count] = '\0';
-      break;
     }
-  }
 }
 
 void splitby2(char *splitting, char tosplit){
@@ -162,7 +163,7 @@ void rewriteline(FILE *theFile, int lineNo, char *rewrite){
 }
 
 void replaceinp(FILE *db1, FILE*db2, char *toRepCall, char *toRepResponse, char *repWith){
-
+  sizeOfSearched2 = 0;
   //Finds toRep as a call, stores in searched
   matchAndNo searched = searchdb(db1, toRepCall, 0);
   //printf("%s %d", searched.b, searched.a);
@@ -175,49 +176,62 @@ void replaceinp(FILE *db1, FILE*db2, char *toRepCall, char *toRepResponse, char 
   char tempNum[512];
   sprintf(tempNum, "%d", lineNo);
   matchAndNo searched2res = searchdb2(db2, tempNum, omit);
-  while (searched2res.a != -1){
+  while (searched2res.a != -1 && searched2res.b[0] != '\0'){
     splitby(searched2res.b, '~');
     splitby(arrsplitby, '~');
     if (atoi(arrsplitby) == lineNo){ //FIX THIS
       searched2[omit] = searched2res;
+      sizeOfSearched2++;
     }
     omit++;
     char tempNum[512];
     sprintf(tempNum, "%d", lineNo);
     searched2res = searchdb2(db2, tempNum, omit);
   }
-  printf("194\n");
   double nums[512];
   int count = 0;
   double e;
-  printf("%i\n", sizeof(searched2) / sizeof(searched2[0]));
-  for (int i = 0; i < sizeof(searched2) / sizeof(searched2[0]); i++){
-    printf("%s", searched2[i].b);
-    if (searched2[i].a != -1){
+  char tempArr[512] = "";
+  for (int i = 0; i < sizeOfSearched2; i++){
+    if (searched2[i].a != -1 || searched2[i].b[0] != '\0' || searched2[i].b == "" || searched2[i].b == " "){
       splitby(searched2[i].b, '~');
       splitby2(arrsplitby, '~');
-      printf("In the if after split %s\n", arrsplitby2);
-      e = atof(arrsplitby2);
-      printf("Atoffed");
+      int lengthOfArr = strlen(arrsplitby2);
+      strncpy(tempArr, arrsplitby2, lengthOfArr);
+      e = atof(tempArr);
       nums[count] = e;
       count++;
     }
   }
-  printf("For loop 1 done\n");
   for (int i = 0; i < sizeof(nums) / sizeof(nums[0]); i++){
     nums[i] = nums[i] * 0.625;
   }
-  printf("For loop 2 done\n");
-  for (int i = 0; i < sizeof(searched2) / sizeof(searched2[0]); i++){
-    if (searched2[i].a != -1){
-      printf("On line 204\n");
+  char tempArr2[512] = "";
+    for (int i = 0; i < sizeOfSearched2; i++){
+    printf("In for %i\n", i);
+    if (searched2[i].a != -1 || searched2[i].b[0] != '\0' || searched2[i].b == "" || searched2[i].b == " "){
       char doublestr[512];
-      sprintf(doublestr, "%lf", nums[i]);
+      sprintf(doublestr, "%f", nums[i]);
+      printf("%s\n", doublestr);
       char *toAppend;
       splitby2(searched2[i].b, '~');
       splitby(searched2[i].b, '~');
-      splitby(arrsplitby, '~');
-      toAppend = strcat(arrsplitby2, strcat("~", strcat(doublestr, strcat("~", arrsplitby))));
+      splitby(arrsplitby, '~');;
+      printf("220\n");
+      int lengthOfArr2 = strlen(arrsplitby);
+      printf("%i\n", lengthOfArr2);
+      strncpy(tempArr2, arrsplitby, lengthOfArr2);
+      printf("%s\n", tempArr2);
+      char *four;
+      tempArr3[512] = "~"
+      four = strcat(tempArr3,tempArr2);
+      printf("221 %s\n", doublestr);
+      char *three = strcat(doublestr, four);
+      printf("223\n");
+      char *two = strcat("~", three);
+      printf("225\n");
+      toAppend = strcat(arrsplitby2, two);
+      printf("234\n");
       rewriteline(db2, searched2[i].a, toAppend);
     }
   }
