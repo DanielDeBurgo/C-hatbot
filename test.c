@@ -3,6 +3,7 @@
 #include <string.h>
 #include <assert.h>
 char arrsplitby[512];
+char arrsplitby2[512];
 char arrGetLine[512];
 int inputsize = 256, bufferchar = 0, count = 0;
 char inp[256]; //Had to restrict memory usage somehow, could have done this on the heap using malloc but would have caused excess bother
@@ -51,20 +52,36 @@ char *getline(FILE *from, int lineNo){
   }
 }
 
-char *splitby(char *splitting, char tosplit){
+void splitby(char *splitting, char tosplit){
   int count = 0;
-  for (int k = 0; k < 512; k++) {
-    arrsplitby[k] = NULL;
-  }
-  for (int i = 0; i < strlen(splitting) - 1; i++){
+  for (int i = 0; i < strlen(splitting); i++){
     if (splitting[i] == tosplit){
       for (int j = i + 1; j < strlen(splitting); j++){
+        if (splitting[j] != '\0' && splitting[j] != '\n'){
           arrsplitby[count] = splitting[j];
           count++;
+        }
       }
+      arrsplitby[count] = '\0';
+      break;
     }
   }
-  return arrsplitby;
+}
+
+void splitby2(char *splitting, char tosplit){
+  int count = 0;
+  for (int i = 0; i < strlen(splitting); i++){
+    if (splitting[i] == tosplit){
+      for (int j = 0; j <= i-1; j++){
+        if (splitting[j] != '\0' && splitting[j] != '\n'){
+          arrsplitby2[count] = splitting[j];
+          count++;
+        }
+      }
+      arrsplitby2[count] = '\0';
+      break;
+    }
+  }
 }
 
 matchAndNo searchdb(FILE *db, char *toFind, int omit){
@@ -94,18 +111,15 @@ matchAndNo searchdb2(FILE *db, char *toFind, int omit){
     //printf("%s", line);
 		if((strstr(line, toFind)) != NULL) {
       if (omit == 0){
-        char *checking = splitby(line, '~');
-        if ((strstr(line, checking)) != NULL){
-          matchAndNo r = {lineNum, line};
-          return r;
-        }
-        else{
-          omit++;
-        }
+        matchAndNo r = {lineNum, line};
+        return r;
+      }
+      else{
+        omit++;
       }
       omit--;
-		}
-		lineNum++;
+    }
+    lineNum++;
 	}
   matchAndNo r = {-1, NULL};
   return r;
@@ -121,14 +135,92 @@ void notsurehowtorespond(FILE *db1, FILE *db2, FILE *db3, char *notSureAbout){
   matchAndNo searched = searchdb(db1, notSureAbout, 0);
   int lineNo = searched.a;
   fseek(db2, 0, SEEK_END);
-  fprintf(db2, "%s~%i\n", inp, lineNo);
-  matchAndNo searched2 = searchdb(db2, inp, 0);
-  lineNo = searched2.a;
-  fseek(db3, 0, SEEK_END);
-  fprintf(db3, "1~%i\n", lineNo);
+  fprintf(db2, "%s~1~%i\n", inp, lineNo);
 }
 
-void replaceinp(FILE *db1, FILE*db2. )
+  //Steps:
+    //Find toRepCall in db1 DONE
+    //Write repWith~db1LineNo~0.25 into db2 DONE
+    //Find all responses with ~db1LineNo at the end in db2 DONE
+    //Return all of their numbers DONE
+    //Divide all numbers by 1.25 DONE
+    //Rewrite all numbers into db2
+
+void rewriteline(FILE *theFile, int lineNo, char *rewrite){
+  rewind(theFile);
+  char line[512];
+  int count = 0;
+  while(fgets(line, 512, theFile) != NULL) {
+    if (count == lineNo){
+      //return line;
+      fprintf(theFile, rewrite);
+    }
+    else{
+      count++;
+    }
+  }
+}
+
+void replaceinp(FILE *db1, FILE*db2, char *toRepCall, char *toRepResponse, char *repWith){
+
+  //Finds toRep as a call, stores in searched
+  matchAndNo searched = searchdb(db1, toRepCall, 0);
+  //printf("%s %d", searched.b, searched.a);
+  int lineNo = searched.a;
+  fseek(db2, 0, SEEK_END);
+  fprintf(db2, "%s~1.6~%i\n", repWith, lineNo);
+  int omit = 0;
+
+  matchAndNo searched2[512];
+  char tempNum[512];
+  sprintf(tempNum, "%d", lineNo);
+  matchAndNo searched2res = searchdb2(db2, tempNum, omit);
+  while (searched2res.a != -1){
+    splitby(searched2res.b, '~');
+    splitby(arrsplitby, '~');
+    if (atoi(arrsplitby) == lineNo){ //FIX THIS
+      searched2[omit] = searched2res;
+    }
+    omit++;
+    char tempNum[512];
+    sprintf(tempNum, "%d", lineNo);
+    searched2res = searchdb2(db2, tempNum, omit);
+  }
+  printf("194\n");
+  double nums[512];
+  int count = 0;
+  double e;
+  printf("%i\n", sizeof(searched2) / sizeof(searched2[0]));
+  for (int i = 0; i < sizeof(searched2) / sizeof(searched2[0]); i++){
+    printf("%s", searched2[i].b);
+    if (searched2[i].a != -1){
+      splitby(searched2[i].b, '~');
+      splitby2(arrsplitby, '~');
+      printf("In the if after split %s\n", arrsplitby2);
+      e = atof(arrsplitby2);
+      printf("Atoffed");
+      nums[count] = e;
+      count++;
+    }
+  }
+  printf("For loop 1 done\n");
+  for (int i = 0; i < sizeof(nums) / sizeof(nums[0]); i++){
+    nums[i] = nums[i] * 0.625;
+  }
+  printf("For loop 2 done\n");
+  for (int i = 0; i < sizeof(searched2) / sizeof(searched2[0]); i++){
+    if (searched2[i].a != -1){
+      printf("On line 204\n");
+      char doublestr[512];
+      sprintf(doublestr, "%lf", nums[i]);
+      char *toAppend;
+      splitby2(searched2[i].b, '~');
+      splitby(searched2[i].b, '~');
+      splitby(arrsplitby, '~');
+      toAppend = strcat(arrsplitby2, strcat("~", strcat(doublestr, strcat("~", arrsplitby))));
+      rewriteline(db2, searched2[i].a, toAppend);
+    }
+  }
 
 
 /* void replaceinp(FILE *db1, FILE *db2, FILE *db3, char *toRepCall, char *toRepResponse, char *repWith){
@@ -271,7 +363,7 @@ int main(int argc, char const *argv[]) {
     //printf("%s", getline(testfile, i));
     //printf("%s", searchdb2(testfile, getline(testfile, i), 0).b);
   //}
-  replaceinp(testfile1, testfile2, testfile3, "Hi", "Hello", "Greetings");
+  replaceinp(testfile1, testfile2, "Hi", "Hello", "Greetings");
 
   fclose(testfile1);
   fclose(testfile2);
