@@ -15,6 +15,8 @@ typedef struct numStruct {
 } numStruct;
 
 char *toReturn[512];
+char readLine[512];
+numStruct toReturn2[512];
 char arrsplitby[512];
 char arrsplitby2[512];
 int numsCount = 0, linesCount = 0;
@@ -54,21 +56,17 @@ void getTheLeft(char *splitting, char tosplit){
 
 matchAndNo searchdb(FILE *db, char *toFind, int omit){
   rewind(db);
-  char line[512];
   int lineNum = 1;
-  while(fgets(line, 512, db) != NULL) {
-    int lengthOfLine = strlen(line);
-    if(line[lengthOfLine] == '\n'){
-      line[lengthOfLine] = '\0';
+  while(fgets(readLine, 512, db) != NULL) {
+    int lengthOfLine = strlen(readLine);
+    if(readLine[lengthOfLine - 1] == '\n'){
+      readLine[lengthOfLine - 1] = '\0';
     }
-    if(line[lengthOfLine - 1] == '\n'){
-      line[lengthOfLine - 1] = '\0';
-    }
-    printf("Comparing %s and %s", line, toFind);
-		if(!(strcmp(line, toFind))) {
+    //printf("Comparing %s and %s", line, toFind);
+		if(!(strcmp(readLine, toFind))) {
       if (omit == 0){
         //printf("%s", line);
-        matchAndNo r = {lineNum, line};
+        matchAndNo r = {lineNum, readLine};
         return r;
       }
       omit--;
@@ -79,36 +77,45 @@ matchAndNo searchdb(FILE *db, char *toFind, int omit){
   return r;
 }
 
-numStruct *findnums(FILE *lookingIn, matchAndNo finding){
+void findnums(FILE *lookingIn, matchAndNo finding){
   numsCount = 0;
   rewind(lookingIn);
-  numStruct toReturn[512];
   char line[512];
   char tempArr[512];
   int lineNum = 1;
   while(fgets(line, 512, lookingIn) != NULL) {
+    int lengthOfLine = strlen(line);
+    if(line[lengthOfLine] == '\n'){
+      line[lengthOfLine] = '\0';
+    }
+    if(line[lengthOfLine - 1] == '\n'){
+      line[lengthOfLine - 1] = '\0';
+    }
     getTheRight(line, '~');
     getTheRight(arrsplitby, '~');
     int lengthOfArr = strlen(arrsplitby);
     strncpy(tempArr, arrsplitby, lengthOfArr);
     int e = atoi(tempArr);
+    //printf("%i\n", lineNum);
     if (e == finding.lineNum){
-      getTheLeft(line, '~');
-      getTheRight(arrsplitby2, '~');
+      getTheRight(line, '~');
+      getTheLeft(arrsplitby, '~');
       double f;
-      int lengthOfArr2 = strlen(arrsplitby);
-      strncpy(tempArr, arrsplitby, lengthOfArr2);
+      int lengthOfArr2 = strlen(arrsplitby2);
+      strncpy(tempArr, arrsplitby2, lengthOfArr2);
       f = atof(tempArr);
-      toReturn[numsCount].lineNum = lineNum;
-      toReturn[numsCount].lineText = line;
-      toReturn[numsCount].probability = f;
+      printf("Current line is %s\n", line);
+      toReturn2[numsCount].lineNum = lineNum;
+      strcpy(toReturn2[numsCount].lineText, line);
+      printf("Added %s %i\n", toReturn2[numsCount].lineText, numsCount);
+      toReturn2[numsCount].probability = f;
       numsCount++;
     }
     lineNum++;
   }
 }
 
-char **readFileToMe(FILE * db){
+void readFileToMe(FILE * db){
   linesCount = 0;
   rewind(db);
   char line[512];
@@ -118,13 +125,12 @@ char **readFileToMe(FILE * db){
     count++;
   }
   linesCount = count;
-  return toReturn;
 }
 
 void rewrite(FILE *db, FILE *out, double numToReWrite, int lineNo, numStruct num){
   //Read db into array of strings
 
-  char **fileAsArray = readFileToMe(db);
+  readFileToMe(db);
 
   //Create string before = everything before 1st ~ in num.b
 
@@ -146,11 +152,11 @@ void rewrite(FILE *db, FILE *out, double numToReWrite, int lineNo, numStruct num
   tempString = strcat(doublestr, tempString);
   tempString = strcat(Squiggle, tempString);
   tempString = strcat(before, tempString);
-  fileAsArray[lineNo] = tempString;
-
+  toReturn[lineNo] = tempString;
   //Write arrayOfStrings into out line by line
+  fseek(out, 0, SEEK_END);
   for (int i = 0; i < linesCount; i++){
-    fprintf(out, "%s\n", fileAsArray[i]);
+    fprintf(out, "%s\n", toReturn[i]);
   }
 
 }
@@ -160,15 +166,19 @@ void replaceinp(FILE *userCalls, FILE *botResponses, FILE *out, char *userCall, 
   matchAndNo call = searchdb(userCalls, userCall, 0);
   fseek(botResponses, 0, SEEK_END);
   fprintf(botResponses, "%s~1.5~%i\n", repWith, call.lineNum);
-  numStruct *nums;
-  nums = findnums(botResponses, call);
+  rewind(botResponses);
+  findnums(botResponses, call);
+  printf("found nums %f and %f numsCount is %i text1 is %s and %s\n", toReturn2[0].probability, toReturn2[1].probability, numsCount, toReturn2[0].lineText, toReturn2[1].lineText);
   for (int i = 0; i < numsCount; i++){
-    printf("%i", i);
-    rewrite(botResponses, out, nums[i].probability * 0.4, call.lineNum, nums[i]);
+    rewrite(botResponses, out, toReturn2[i].probability * 0.4, call.lineNum, toReturn2[i]);
   }
 }
-
 int main(int argc, char const *argv[]) {
+  char Squig[512] = "";
+  for (int i = 0; i < 512; i++){
+    toReturn2[i].lineText = Squig;
+  }
+  
   FILE *testfile1 = fopen("test.txt", "r");
   FILE *testfile2 = fopen("test2.txt", "r+");
   FILE *testfile3 = fopen("output.txt", "w+"); //trunc
@@ -179,5 +189,6 @@ int main(int argc, char const *argv[]) {
 
   fclose(testfile1);
   fclose(testfile2);
+  fclose(testfile3);
   return 0;
 }
