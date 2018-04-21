@@ -70,11 +70,11 @@ void notsurehowtorespond(char *notSureAbout, FILE *userCalls, FILE *botResponses
   getinp();
   if (zerone){
     fseek(botResponses, 0, SEEK_END);
-    fprintf(botResponses, "%s~1~%i\n", inp0, linesOfResps);
+    fprintf(botResponses, "%s~1~%i\n", inp0, linesOfResps -1);
   }
   else{
     fseek(botResponses, 0, SEEK_END);
-    fprintf(botResponses, "%s~1~%i\n", inp1, linesOfResps);
+    fprintf(botResponses, "%s~1~%i\n", inp1, linesOfResps -1);
   }
   printf("Okay, that's what I'll say from now on. If you don't like it you can always use {REP} to tell me to say something else\n");
 }
@@ -297,7 +297,7 @@ int main(int argc, char const *argv[]) {
   FILE *testfile3 = fopen("output.txt", "w+"); //trunc
 
   getinp();
-  while ((strcmp(inp0, "{END CHAT}")) || (strcmp(inp1, "{END CHAT}"))){ //While they want to carry on talking
+  while ((strcmp(inp0, "{END CHAT}")) && (strcmp(inp1, "{END CHAT}"))){ //While they want to carry on talking
     if (zerone){
       if (!(strcmp(inp0, "{REP}"))){
         printf("What should I say instead?\n");
