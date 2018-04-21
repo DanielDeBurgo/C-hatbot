@@ -4,7 +4,7 @@
 EXE_DIR = .
 EXE = $(EXE_DIR)/chatbot
 
-SRC= UX.c Offended.c BAckchat.c
+SRC= UX.c Offended.c Backchat.c
 
 # generic build details
 

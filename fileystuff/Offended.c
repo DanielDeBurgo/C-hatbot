@@ -2,24 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/unistd.h>
-
-typedef struct matchAndNo {
-    int lineNum;
-    char *lineText;
-} matchAndNo;
-
-typedef struct numStruct {
-    int lineNum;
-    char *lineText;
-    double probability;
-} numStruct;
-
-char *toReturn[512];
-char readLine[512];
-numStruct toReturn2[512];
-char arrsplitby[512];
-char arrsplitby2[512];
-int numsCount = 0, linesCount = 0;
+#include "Offended.h"
 
 void getTheRight(char *splitting, char tosplit){
   int count = 0;
@@ -104,10 +87,13 @@ void findnums(FILE *lookingIn, matchAndNo finding){
       int lengthOfArr2 = strlen(arrsplitby2);
       strncpy(tempArr, arrsplitby2, lengthOfArr2);
       f = atof(tempArr);
-      printf("Current line is %s\n", line);
       toReturn2[numsCount].lineNum = lineNum;
-      strcpy(toReturn2[numsCount].lineText, line);
-      printf("Added %s %i\n", toReturn2[numsCount].lineText, numsCount);
+      for (int i = 0; i < strlen(line); i++){
+        globTemp[i] = line[i];
+      }
+      for (int i = 0; i < strlen(globTemp); i++){
+        globTemp2[numsCount][i] = globTemp[i];
+      }
       toReturn2[numsCount].probability = f;
       numsCount++;
     }
@@ -121,16 +107,15 @@ void readFileToMe(FILE * db){
   char line[512];
   int count = 0;
   while(fgets(line, 512, db) != NULL) {
-    toReturn[count] = line;
+    for (int i = 0; i < strlen(line); i++){
+      toReturn[count][i] = line[i];
+    }
     count++;
   }
   linesCount = count;
 }
 
 void rewrite(FILE *db, FILE *out, double numToReWrite, int lineNo, numStruct num){
-  //Read db into array of strings
-
-  readFileToMe(db);
 
   //Create string before = everything before 1st ~ in num.b
 
@@ -150,15 +135,14 @@ void rewrite(FILE *db, FILE *out, double numToReWrite, int lineNo, numStruct num
   char doublestr[512];
   sprintf(doublestr, "%f", numToReWrite);
   tempString = strcat(doublestr, tempString);
-  tempString = strcat(Squiggle, tempString);
+  char Squiggle2[512] = "~";
+  tempString = strcat(Squiggle2, tempString);
   tempString = strcat(before, tempString);
-  toReturn[lineNo] = tempString;
-  //Write arrayOfStrings into out line by line
-  fseek(out, 0, SEEK_END);
-  for (int i = 0; i < linesCount; i++){
-    fprintf(out, "%s\n", toReturn[i]);
+  for (int i = 0; i < strlen(tempString); i++){
+    toReturn[lineNo][i] = tempString[i];
   }
 
+  //Write arrayOfStrings into out line by line
 }
 
 //REMEMBER WHEN YOU CALL THIS FUNCTION OUT MUST BE AN EMPTY FILE, AFTER RUNNING THE FUNCTION WE DELETE botResponses and replace it wih out
@@ -168,23 +152,46 @@ void replaceinp(FILE *userCalls, FILE *botResponses, FILE *out, char *userCall, 
   fprintf(botResponses, "%s~1.5~%i\n", repWith, call.lineNum);
   rewind(botResponses);
   findnums(botResponses, call);
-  printf("found nums %f and %f numsCount is %i text1 is %s and %s\n", toReturn2[0].probability, toReturn2[1].probability, numsCount, toReturn2[0].lineText, toReturn2[1].lineText);
+  for (int i = 0; i <= numsCount; i++){
+    toReturn2[i].lineText = globTemp2[i];
+  }
+
+  readFileToMe(botResponses);
   for (int i = 0; i < numsCount; i++){
-    rewrite(botResponses, out, toReturn2[i].probability * 0.4, call.lineNum, toReturn2[i]);
+    rewrite(botResponses, out, toReturn2[i].probability * 0.4, toReturn2[i].lineNum, toReturn2[i]);
+  }
+  rewind(out);
+
+
+  for (int i = 0; i <= linesCount; i++){
+    int lengthOfLine = strlen(toReturn[i]);
+    if(toReturn[i][lengthOfLine] == '\n'){
+      toReturn[i][lengthOfLine] = '\0';
+    }
+    if(toReturn[i][lengthOfLine - 1] == '\n'){
+      toReturn[i][lengthOfLine - 1] = '\0';
+    }
+    if (i != toReturn2[0].lineNum - 1){ //if i is not equal to the first line number of the ones we're replacing
+      fprintf(out, "%s\n", toReturn[i]);
+    }
+    else{
+      fprintf(out, "\n");
+    }
   }
 }
-int main(int argc, char const *argv[]) {
+
+/*int main(int argc, char const *argv[]) {
   char Squig[512] = "";
   for (int i = 0; i < 512; i++){
     toReturn2[i].lineText = Squig;
   }
-  
+
   FILE *testfile1 = fopen("test.txt", "r");
   FILE *testfile2 = fopen("test2.txt", "r+");
   FILE *testfile3 = fopen("output.txt", "w+"); //trunc
 
   replaceinp(testfile1, testfile2, testfile3, "Hi", "Hello", "Greetings");
-  unlink("test2.txt");
+  remove("test2.txt");
   rename("output.txt", "test2.txt");
 
   fclose(testfile1);
@@ -192,3 +199,4 @@ int main(int argc, char const *argv[]) {
   fclose(testfile3);
   return 0;
 }
+*/
