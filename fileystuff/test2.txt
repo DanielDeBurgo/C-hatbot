@@ -5,3 +5,5 @@ Hey, what's up?~0.600000~3
 Hey~1~4
 hey~1~5
 good, thank you~1~6
+Hey there~1~7
+I'm not quite sure for now, I'll get back to you on that one when I get emotions~1~8
