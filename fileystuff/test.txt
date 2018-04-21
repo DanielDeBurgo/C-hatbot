@@ -2,3 +2,5 @@ Hello
 Hi
 Hey
 Hey there
+hello there
+how are you?

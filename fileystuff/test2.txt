@@ -3,3 +3,5 @@ Hello~1~2
 Hi~0.400000~3
 Hey, what's up?~0.600000~3
 Hey~1~4
+hey~1~5
+good, thank you~1~6
