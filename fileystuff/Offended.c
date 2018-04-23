@@ -4,6 +4,15 @@
 #include <sys/unistd.h>
 #include "Offended.h"
 
+char globTemp[512];
+char globTemp2[512][512];
+char toReturn[512][512];
+char readLine[512];
+numStruct toReturn2[512];
+char arrsplitby[512];
+char arrsplitby2[512];
+int numsCount, linesCount;
+
 void getTheRight(char *splitting, char tosplit){
   int count = 0;
   if(strlen(splitting) > 0)
@@ -141,6 +150,7 @@ void rewrite(FILE *db, FILE *out, double numToReWrite, int lineNo, numStruct num
   for (int i = 0; i < strlen(tempString); i++){
     toReturn[lineNo][i] = tempString[i];
   }
+  toReturn[lineNo][strlen(tempString)] = '\0';
 
   //Write arrayOfStrings into out line by line
 }
@@ -174,29 +184,5 @@ void replaceinp(FILE *userCalls, FILE *botResponses, FILE *out, char *userCall, 
     if (i != toReturn2[0].lineNum - 1){ //if i is not equal to the first line number of the ones we're replacing
       fprintf(out, "%s\n", toReturn[i]);
     }
-    else{
-      fprintf(out, "\n");
-    }
   }
 }
-
-/*int main(int argc, char const *argv[]) {
-  char Squig[512] = "";
-  for (int i = 0; i < 512; i++){
-    toReturn2[i].lineText = Squig;
-  }
-
-  FILE *testfile1 = fopen("test.txt", "r");
-  FILE *testfile2 = fopen("test2.txt", "r+");
-  FILE *testfile3 = fopen("output.txt", "w+"); //trunc
-
-  replaceinp(testfile1, testfile2, testfile3, "Hi", "Hello", "Greetings");
-  remove("test2.txt");
-  rename("output.txt", "test2.txt");
-
-  fclose(testfile1);
-  fclose(testfile2);
-  fclose(testfile3);
-  return 0;
-}
-*/

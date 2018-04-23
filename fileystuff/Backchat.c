@@ -4,6 +4,16 @@
 #include <time.h>
 #include <sys/unistd.h>
 #include "Backchat.h"
+#include "Offended.h"
+
+extern char globTemp[512];
+extern char globTemp2[512][512];
+extern char toReturn[512][512];
+extern char readLine[512];
+extern numStruct toReturn2[512];
+extern char arrsplitby[512];
+extern char arrsplitby2[512];
+extern int numsCount, linesCount;
 
 char *respond(char *userCall, FILE *userCalls, FILE *botResponses){
   matchAndNo call = searchdb(userCalls, userCall, 0);
@@ -37,21 +47,3 @@ char *respond(char *userCall, FILE *userCalls, FILE *botResponses){
     return NULL;
   }
 }
-
-/*
-int main(int argc, char const *argv[]) {
-  char Squig[512] = "";
-  for (int i = 0; i < 512; i++){
-    toReturn2[i].lineText = Squig;
-  }
-
-  FILE *testfile1 = fopen("test.txt", "r");
-  FILE *testfile2 = fopen("test2.txt", "r+");
-
-  printf("%s\n", respond("Hi", testfile1, testfile2));
-
-  fclose(testfile1);
-  fclose(testfile2);
-  return 0;
-}
-*/

@@ -1,10 +1,8 @@
 Hi~1~1
-Hello~1~2
-Hi~0.400000~3
-Hey, what's up?~0.600000~3
-Hey~1~4
-hey~1~5
-good, thank you~1~6
-Hey there~1~7
-I'm not quite sure for now, I'll get back to you on that one when I get emotions~1~8
-Not much either, just been doing a lot of talking recently~1~9
+Hello~0.400000~2
+Not too sure yet~1~4
+Hi~1~5
+Hey~1.5~2
+Hey~0.600000~2
+I'm fine thanks, how are you?~0.400000~6
+Good~0.600000~6
