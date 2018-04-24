@@ -97,9 +97,12 @@ void findnums(FILE *lookingIn, matchAndNo finding){
       strncpy(tempArr, arrsplitby2, lengthOfArr2);
       f = atof(tempArr);
       toReturn2[numsCount].lineNum = lineNum;
+      //printf("%i\n", strlen(line));
       for (int i = 0; i < strlen(line); i++){
         globTemp[i] = line[i];
       }
+      globTemp[strlen(line)] = '\0';
+      //printf("%i\n", strlen(globTemp));
       for (int i = 0; i < strlen(globTemp); i++){
         globTemp2[numsCount][i] = globTemp[i];
       }
@@ -155,18 +158,83 @@ void rewrite(FILE *db, FILE *out, double numToReWrite, int lineNo, numStruct num
   //Write arrayOfStrings into out line by line
 }
 
+int isvalueinarray(int val, int *arr, int size){
+    int i;
+    for (i=0; i < size; i++) {
+        if (arr[i] == val)
+            return 1;
+    }
+    return 0;
+}
+
 //REMEMBER WHEN YOU CALL THIS FUNCTION OUT MUST BE AN EMPTY FILE, AFTER RUNNING THE FUNCTION WE DELETE botResponses and replace it wih out
 void replaceinp(FILE *userCalls, FILE *botResponses, FILE *out, char *userCall, char *offensiveResponse, char *repWith){
   matchAndNo call = searchdb(userCalls, userCall, 0);
   fseek(botResponses, 0, SEEK_END);
   fprintf(botResponses, "%s~1.5~%i\n", repWith, call.lineNum);
   rewind(botResponses);
+  rewind(out);
   findnums(botResponses, call);
-  for (int i = 0; i <= numsCount; i++){
+  for (int i = 0; i < numsCount; i++){
     toReturn2[i].lineText = globTemp2[i];
+    //printf("%s\n", toReturn2[i].lineText);
+  }
+  int skip[512];
+  int skipCount = 0;
+  for (int i = 0; i < numsCount; i++){
+    char doublestr[512];
+    sprintf(doublestr, "%f", toReturn2[i].probability * 0.4);
+    getTheLeft(toReturn2[i].lineText, '~');
+    getTheLeft(arrsplitby2, '~');
+    char *before = arrsplitby2;
+    getTheRight(toReturn2[i].lineText, '~');
+    getTheRight(arrsplitby, '~');
+    char *after = arrsplitby;
+    //printf("%s\n", after);
+    skip[skipCount] = atoi(after);
+    skipCount++;
+    char toPrint[512];
+    //printf("%s - %i, %s - %i\n", before, strlen(before), after, strlen(after));
+    for (int j = 0; j < strlen(before) + strlen(doublestr) + strlen(after) + 2; j++){
+      if (j < strlen(before)){
+        toPrint[j] = before[j];
+      }
+      else if (j == strlen(before)){
+        toPrint[j] = '~';
+      }
+      //FIX
+      else if (j <= strlen(before) + strlen(doublestr)){
+        toPrint[j] = doublestr[j - strlen(before) - 1];
+      }
+      //FIX
+      else if (j == strlen(before) + strlen(doublestr) + 1){
+        toPrint[j] = '~';
+      }
+      else if (j < strlen(before) + strlen(doublestr) + strlen(after) + 2){
+        toPrint[j] = after[j - strlen(doublestr) - strlen(before) - 2];
+      }
+    }
+    toPrint[strlen(before) + strlen(doublestr) + strlen(after) + 2] = '\0';
+    //printf("%s\n", toPrint);
+    fprintf(out, "%s\n", toPrint);
   }
 
   readFileToMe(botResponses);
+  for (int i = 0; i <= linesCount; i++){
+    int lengthOfLine = strlen(toReturn[i]);
+    if(toReturn[i][lengthOfLine] == '\n'){
+      toReturn[i][lengthOfLine] = '\0';
+    }
+    if(toReturn[i][lengthOfLine - 1] == '\n'){
+      toReturn[i][lengthOfLine - 1] = '\0';
+    }
+    getTheRight(toReturn[i], '~');
+    getTheRight(arrsplitby, '~');
+    if (!(isvalueinarray(atoi(arrsplitby), skip, skipCount))){
+      fprintf(out, "%s\n", toReturn[i]);
+    }
+  }
+  /*readFileToMe(botResponses);
   for (int i = 0; i < numsCount; i++){
     rewrite(botResponses, out, toReturn2[i].probability * 0.4, toReturn2[i].lineNum, toReturn2[i]);
   }
@@ -185,4 +253,5 @@ void replaceinp(FILE *userCalls, FILE *botResponses, FILE *out, char *userCall, 
       fprintf(out, "%s\n", toReturn[i]);
     }
   }
+  */
 }

@@ -95,6 +95,7 @@ int main(int argc, char const *argv[]) {
         FILE *testfile2 = fopen("test2.txt", "r+");
         FILE *testfile3 = fopen("output.txt", "w+");
         printf("Okay, I'll do that more often now\n");
+        exit(0);
       }
       else{
         int j = 0;
@@ -125,6 +126,7 @@ int main(int argc, char const *argv[]) {
         FILE *testfile2 = fopen("test2.txt", "r+");
         FILE *testfile3 = fopen("output.txt", "w+");
         printf("Okay, I'll do that more often now\n");
+        exit(0);
       }
       else{
         int j = 0;

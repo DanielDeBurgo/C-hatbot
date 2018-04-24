@@ -1,12 +1,10 @@
-Hi~1~1
-Hello~0.400000~2
-Hey~1~3
-Not too sure yet~1~4
-Hi~1~5
-Hey~1.5~2
-Hey~0.600000~2
-I'm fine thanks, how are you?~0.400000~6
-Good~0.600000~6
-APRIL (Artificial Personal Responsive Intellect of Linguistics)~1~7
-Quite alright what what~1~8
+Hello~0.400000~3
+Hi~0.600000~3
+Hey~1~1
+Hi~1~2
+Not too sure~1~4
+Heyy~1~5
+not too sure~1~6
+APRIL~1~7
+Rather well what what~1~8
 Hey~1~9
