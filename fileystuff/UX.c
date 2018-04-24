@@ -56,7 +56,7 @@ int getLinesOfFile(FILE *linedFile){
 void notsurehowtorespond(char *notSureAbout, FILE *userCalls, FILE *botResponses){
   fseek(userCalls, 0, SEEK_END);
   fprintf(userCalls, "%s\n", notSureAbout);
-  int linesOfResps = getLinesOfFile(botResponses);
+  int linesOfResps = getLinesOfFile(userCalls);
   printf("How would you respond to that?\n");
   getinp();
   if (zerone){
@@ -68,6 +68,7 @@ void notsurehowtorespond(char *notSureAbout, FILE *userCalls, FILE *botResponses
     fprintf(botResponses, "%s~1~%i\n", inp1, linesOfResps -1);
   }
   printf("Okay, that's what I'll say from now on. If you don't like it you can always use {REP} to tell me to say something else\n");
+  exit(0);
 }
 
 int main(int argc, char const *argv[]) {
