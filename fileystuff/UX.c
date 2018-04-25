@@ -81,6 +81,10 @@ int main(int argc, char const *argv[]) {
   FILE *testfile2 = fopen("test2.txt", "r+");
   FILE *testfile3 = fopen("output.txt", "w+"); //trunc
 
+  if (testfile1 == NULL || testfile2 == NULL || testfile3 == NULL){
+    printf("Error opening files please check file states and try again!");
+    exit(1);
+  }
   getinp();
   while ((strcmp(inp0, "{END CHAT}")) && (strcmp(inp1, "{END CHAT}"))){ //While they want to carry on talking
     if (zerone){
@@ -94,6 +98,10 @@ int main(int argc, char const *argv[]) {
         fclose(testfile3);
         FILE *testfile2 = fopen("test2.txt", "r+");
         FILE *testfile3 = fopen("output.txt", "w+");
+        if (testfile2 == NULL || testfile3 == NULL){
+          printf("Error opening files please check file states and try again!");
+          exit(1);
+        }
         printf("Okay, I'll do that more often now\n");
         exit(0);
       }
@@ -110,6 +118,14 @@ int main(int argc, char const *argv[]) {
         }
         else{
           notsurehowtorespond(inp0, testfile1, testfile2);
+          fclose(testfile1);
+          fclose(testfile2);
+          FILE *testfile1 = fopen("test.txt", "r+");
+          FILE *testfile2 = fopen("test2.txt", "r+");
+          if (testfile1 == NULL || testfile2 == NULL){
+            printf("Error opening files please check file states and try again!");
+            exit(1);
+          }
         }
       }
     }
@@ -125,6 +141,10 @@ int main(int argc, char const *argv[]) {
         fclose(testfile3);
         FILE *testfile2 = fopen("test2.txt", "r+");
         FILE *testfile3 = fopen("output.txt", "w+");
+        if (testfile2 == NULL || testfile3 == NULL){
+          printf("Error opening files please check file states and try again!");
+          exit(1);
+        }
         printf("Okay, I'll do that more often now\n");
         exit(0);
       }
@@ -145,6 +165,10 @@ int main(int argc, char const *argv[]) {
           fclose(testfile2);
           FILE *testfile1 = fopen("test.txt", "r+");
           FILE *testfile2 = fopen("test2.txt", "r+");
+          if (testfile1 == NULL || testfile2 == NULL || testfile3 == NULL){
+            printf("Error opening files please check file states and try again!");
+            exit(1);
+          }
         }
       }
     }
