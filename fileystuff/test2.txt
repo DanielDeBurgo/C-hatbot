@@ -1,5 +1,4 @@
-Hello~0.400000~3
-Hi~0.60000~3
+Hello~1~3
 Hey~1~1
 Hi~1~2
 Not too sure~1~4

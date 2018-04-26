@@ -87,7 +87,9 @@ void findnums(FILE *lookingIn, matchAndNo finding){
     getTheRight(arrsplitby, '~');
     int lengthOfArr = strlen(arrsplitby);
     strncpy(tempArr, arrsplitby, lengthOfArr);
+    tempArr[lengthOfArr] = '\0';
     int e = atoi(tempArr);
+    printf("%s %i\n", line, e);
     //printf("%i\n", lineNum);
     if (e == finding.lineNum){
       getTheRight(line, '~');
@@ -106,6 +108,7 @@ void findnums(FILE *lookingIn, matchAndNo finding){
       for (int i = 0; i < strlen(globTemp); i++){
         globTemp2[numsCount][i] = globTemp[i];
       }
+      //printf("%s\n", globTemp2[numsCount]);
       toReturn2[numsCount].probability = f;
       numsCount++;
     }
@@ -182,6 +185,7 @@ void replaceinp(FILE *userCalls, FILE *botResponses, FILE *out, char *userCall, 
   int skip[512];
   int skipCount = 0;
   for (int i = 0; i < numsCount; i++){
+    printf("%i %s\n", i, toReturn2[i].lineText);
     char doublestr[512];
     sprintf(doublestr, "%f", toReturn2[i].probability * 0.4);
     getTheLeft(toReturn2[i].lineText, '~');
