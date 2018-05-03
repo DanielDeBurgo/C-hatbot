@@ -43,6 +43,7 @@ void getinp(){ //gets user input
   }
 }
 
+//Returns count of lines in fine using fgets
 int getLinesOfFile(FILE *linedFile){
   rewind(linedFile);
   char line[512];
@@ -53,6 +54,7 @@ int getLinesOfFile(FILE *linedFile){
   return count;
 }
 
+//What to do when the bot gets a call it's never seen before
 void notsurehowtorespond(char *notSureAbout, FILE *userCalls, FILE *botResponses){
   fseek(userCalls, 0, SEEK_END);
   fprintf(userCalls, "%s\n", notSureAbout);
@@ -81,14 +83,17 @@ int main(int argc, char const *argv[]) {
   FILE *testfile2 = fopen("test2.txt", "r+");
   FILE *testfile3 = fopen("output.txt", "w+"); //trunc
 
+  //Validation
   if (testfile1 == NULL || testfile2 == NULL || testfile3 == NULL){
     printf("Error opening files please check file states and try again!");
     exit(1);
   }
   getinp();
   while ((strcmp(inp0, "{END CHAT}")) && (strcmp(inp1, "{END CHAT}"))){ //While they want to carry on talking
+    //Split into if zerone and else to allow for coversation backtracking for use with replaceinp function
     if (zerone){
       if (!(strcmp(inp0, "{REP}"))){
+        //If they want to replace
         printf("What should I say instead?\n");
         getinp();
         replaceinp(testfile1, testfile2, testfile3, inp2, response, inp1);
@@ -97,7 +102,8 @@ int main(int argc, char const *argv[]) {
         fclose(testfile2);
         fclose(testfile3);
         FILE *testfile2 = fopen("test2.txt", "r+");
-        FILE *testfile3 = fopen("output.txt", "w+");
+        FILE *testfile3 = fopen("output.txt", "w+"); //Trunc
+        //Validation
         if (testfile2 == NULL || testfile3 == NULL){
           printf("Error opening files please check file states and try again!");
           exit(1);
@@ -111,7 +117,7 @@ int main(int argc, char const *argv[]) {
           inp2[j] = inp0[j];
           j++;
         }
-        inp2[j] = '\0';
+        inp2[j] = '\0'; //String termination
         response = respond(inp0, testfile1, testfile2);
         if (response != NULL){
           printf("%s\n", response);
@@ -122,6 +128,7 @@ int main(int argc, char const *argv[]) {
           fclose(testfile2);
           FILE *testfile1 = fopen("test.txt", "r+");
           FILE *testfile2 = fopen("test2.txt", "r+");
+          //Validation
           if (testfile1 == NULL || testfile2 == NULL){
             printf("Error opening files please check file states and try again!");
             exit(1);
@@ -131,6 +138,7 @@ int main(int argc, char const *argv[]) {
     }
     else{
       if (!(strcmp(inp1, "{REP}"))){
+        //If they want to replace
         printf("What should I say instead?\n");
         int j = 0;
         getinp();
@@ -140,7 +148,8 @@ int main(int argc, char const *argv[]) {
         fclose(testfile2);
         fclose(testfile3);
         FILE *testfile2 = fopen("test2.txt", "r+");
-        FILE *testfile3 = fopen("output.txt", "w+");
+        FILE *testfile3 = fopen("output.txt", "w+"); //trunc
+        //Validation
         if (testfile2 == NULL || testfile3 == NULL){
           printf("Error opening files please check file states and try again!");
           exit(1);
@@ -154,7 +163,7 @@ int main(int argc, char const *argv[]) {
           inp2[j] = inp1[j];
           j++;
         }
-        inp2[j] = '\0';
+        inp2[j] = '\0'; //Termination of string
         response = respond(inp1, testfile1, testfile2);
         if (response != NULL){
           printf("%s\n", response);
@@ -165,6 +174,7 @@ int main(int argc, char const *argv[]) {
           fclose(testfile2);
           FILE *testfile1 = fopen("test.txt", "r+");
           FILE *testfile2 = fopen("test2.txt", "r+");
+          //Validation
           if (testfile1 == NULL || testfile2 == NULL || testfile3 == NULL){
             printf("Error opening files please check file states and try again!");
             exit(1);
@@ -174,7 +184,7 @@ int main(int argc, char const *argv[]) {
     }
     getinp();
   }
-
+  //FIle I/O
   fclose(testfile1);
   fclose(testfile2);
   fclose(testfile3);

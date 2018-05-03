@@ -15,6 +15,7 @@ extern char arrsplitby[512];
 extern char arrsplitby2[512];
 extern int numsCount, linesCount;
 
+//Only necessary function chooses a random response with regard to the probabilities of responding to a specific call
 char *respond(char *userCall, FILE *userCalls, FILE *botResponses){
   matchAndNo call = searchdb(userCalls, userCall, 0);
   if (call.lineText != NULL){

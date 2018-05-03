@@ -4,6 +4,7 @@
 #include <sys/unistd.h>
 #include "Offended.h"
 
+//Globals
 char globTemp[512];
 char globTemp2[512][512];
 char toReturn[512][512];
@@ -13,6 +14,7 @@ char arrsplitby[512];
 char arrsplitby2[512];
 int numsCount, linesCount;
 
+//Gtes the RHS of string
 void getTheRight(char *splitting, char tosplit){
   int count = 0;
   if(strlen(splitting) > 0)
@@ -30,6 +32,7 @@ void getTheRight(char *splitting, char tosplit){
     }
 }
 
+//Get the LHS of string
 void getTheLeft(char *splitting, char tosplit){
   int count = 0;
   for (int i = 0; i < strlen(splitting); i++){
@@ -46,6 +49,7 @@ void getTheLeft(char *splitting, char tosplit){
   }
 }
 
+//Does what it says on the tin, searches the db for all call
 matchAndNo searchdb(FILE *db, char *toFind, int omit){
   rewind(db);
   int lineNum = 1;
@@ -54,10 +58,8 @@ matchAndNo searchdb(FILE *db, char *toFind, int omit){
     if(readLine[lengthOfLine - 1] == '\n'){
       readLine[lengthOfLine - 1] = '\0';
     }
-    //printf("Comparing %s and %s", line, toFind);
 		if(!(strcmp(readLine, toFind))) {
       if (omit == 0){
-        //printf("%s", line);
         matchAndNo r = {lineNum, readLine};
         return r;
       }
@@ -69,6 +71,7 @@ matchAndNo searchdb(FILE *db, char *toFind, int omit){
   return r;
 }
 
+//Searches the datbase for probabilities relating to a specific matchAndNo
 void findnums(FILE *lookingIn, matchAndNo finding){
   numsCount = 0;
   rewind(lookingIn);
@@ -89,8 +92,6 @@ void findnums(FILE *lookingIn, matchAndNo finding){
     strncpy(tempArr, arrsplitby, lengthOfArr);
     tempArr[lengthOfArr] = '\0';
     int e = atoi(tempArr);
-    printf("%s %i\n", line, e);
-    //printf("%i\n", lineNum);
     if (e == finding.lineNum){
       getTheRight(line, '~');
       getTheLeft(arrsplitby, '~');
@@ -99,16 +100,13 @@ void findnums(FILE *lookingIn, matchAndNo finding){
       strncpy(tempArr, arrsplitby2, lengthOfArr2);
       f = atof(tempArr);
       toReturn2[numsCount].lineNum = lineNum;
-      //printf("%i\n", strlen(line));
       for (int i = 0; i < strlen(line); i++){
         globTemp[i] = line[i];
       }
       globTemp[strlen(line)] = '\0';
-      //printf("%i\n", strlen(globTemp));
       for (int i = 0; i < strlen(globTemp); i++){
         globTemp2[numsCount][i] = globTemp[i];
       }
-      //printf("%s\n", globTemp2[numsCount]);
       toReturn2[numsCount].probability = f;
       numsCount++;
     }
@@ -116,6 +114,7 @@ void findnums(FILE *lookingIn, matchAndNo finding){
   }
 }
 
+//Loads contents of file into array
 void readFileToMe(FILE * db){
   linesCount = 0;
   rewind(db);
@@ -130,6 +129,7 @@ void readFileToMe(FILE * db){
   linesCount = count;
 }
 
+//Rewrites a number (probability) from local data to file removing old one
 void rewrite(FILE *db, FILE *out, double numToReWrite, int lineNo, numStruct num){
 
   //Create string before = everything before 1st ~ in num.b
@@ -161,6 +161,7 @@ void rewrite(FILE *db, FILE *out, double numToReWrite, int lineNo, numStruct num
   //Write arrayOfStrings into out line by line
 }
 
+//Checks if a value is in an array
 int isvalueinarray(int val, int *arr, int size){
     int i;
     for (i=0; i < size; i++) {
@@ -171,7 +172,7 @@ int isvalueinarray(int val, int *arr, int size){
 }
 
 //REMEMBER WHEN YOU CALL THIS FUNCTION OUT MUST BE AN EMPTY FILE, AFTER RUNNING THE FUNCTION WE DELETE botResponses and replace it wih out
-void replaceinp(FILE *userCalls, FILE *botResponses, FILE *out, char *userCall, char *offensiveResponse, char *repWith){
+void replaceinp(FILE *userCalls, FILE *botResponses, FILE *out, char *userCall, char *offensiveResponse, char *repWith){ //Cool probability stuff in the files to use with REP command
   matchAndNo call = searchdb(userCalls, userCall, 0);
   fseek(botResponses, 0, SEEK_END);
   fprintf(botResponses, "%s~1.5~%i\n", repWith, call.lineNum);
@@ -185,7 +186,7 @@ void replaceinp(FILE *userCalls, FILE *botResponses, FILE *out, char *userCall, 
   int skip[512];
   int skipCount = 0;
   for (int i = 0; i < numsCount; i++){
-    printf("%i %s\n", i, toReturn2[i].lineText);
+    //printf("%i %s\n", i, toReturn2[i].lineText);
     char doublestr[512];
     sprintf(doublestr, "%f", toReturn2[i].probability * 0.4);
     getTheLeft(toReturn2[i].lineText, '~');
@@ -194,11 +195,9 @@ void replaceinp(FILE *userCalls, FILE *botResponses, FILE *out, char *userCall, 
     getTheRight(toReturn2[i].lineText, '~');
     getTheRight(arrsplitby, '~');
     char *after = arrsplitby;
-    //printf("%s\n", after);
     skip[skipCount] = atoi(after);
     skipCount++;
     char toPrint[512];
-    //printf("%s - %i, %s - %i\n", before, strlen(before), after, strlen(after));
     for (int j = 0; j < strlen(before) + strlen(doublestr) + strlen(after) + 2; j++){
       if (j < strlen(before)){
         toPrint[j] = before[j];
